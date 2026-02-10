@@ -85,11 +85,53 @@ productsRouter.get("/products/:id", async (req, res) => {
 /** 상품 수정(U) **/
 productsRouter.put("/products/:id", async (req, res) => {
   // 1. 상품 ID 파싱
+  const { id } = req.params;
+
   // 2. 상품 수정 정보 파싱하기
+  const { name, description, status, manager, password } = req.body;
+
   // 3. DB에서 조회 (패스워드 포함)
+  const existingProduct = await Product.findById(id, { password: true });
+
   // 4. 비밀번호 일치 여부 확인
-  // 5. DB에 갱신
+  const isPasswordMatched = password === existingProduct.password;
+  if (!isPasswordMatched) {
+    return res.status(401).json({
+      status: 401,
+      message: "비밀번호가 일치하지 않습니다.",
+    });
+  }
+
+  // 5. 입력된 정보 확인 (없는 값은 false처리되어 사라짐)
+  const updatedInfo = {
+    ...(name && { name }),
+    ...(description && { description }),
+    ...(status && { status }),
+    ...(manager && { manager }),
+  };
+
+  // 5. DB에 갱신 (new 옵션을 true로 해야 수정 후 데이터가 표시된다)
+  const data = await Product.findByIdAndUpdate(id, updatedInfo, {
+    returnDocument: "after",
+  });
+
   // 6. 완료 메시지 반환
+  // 6-1. API명세서 틀에 맞게 데이터 수정
+  const filteredData = {
+    id: data.id,
+    name: data.name,
+    description: data.description,
+    manager: data.manager,
+    status: data.status,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
+  // 6-2. 반환
+  return res.status(200).json({
+    status: 200,
+    message: "상품 수정에 성공했습니다.",
+    data: filteredData,
+  });
 });
 
 /** 상품 삭제(D) **/
