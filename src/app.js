@@ -2,6 +2,7 @@ import express from "express";
 import { SERVER_PORT } from "./constants/env.constant.js";
 import { productsRouter } from "./routers/products.router.js";
 import { connect } from "./schemas/index.js";
+import { errorHandler } from "./middlewares/error-handler.middleware.js";
 
 // MongoDB에 연결
 connect();
@@ -17,6 +18,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Router로 넘겨준다.
 app.use("/", productsRouter);
+
+// Error Handler Middleware
+app.use(errorHandler);
 
 // 서버가 어느 포트로 열렸는지 알려줌
 app.listen(SERVER_PORT, () => {
