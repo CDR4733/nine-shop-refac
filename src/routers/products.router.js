@@ -13,7 +13,7 @@ productsRouter.post("/products", async (req, res) => {
   const data = await product.save();
 
   // 3. 완료 메시지 반환
-  // 3-1. 비밀번호 안 보이게 데이터 수정
+  // 3-1. API명세서 틀에 맞게 데이터 수정
   const filteredData = {
     id: data.id,
     name: data.name,
@@ -34,13 +34,24 @@ productsRouter.post("/products", async (req, res) => {
 /** 상품 목록 조회(R-A) **/
 productsRouter.get("/products", async (req, res) => {
   // 1. DB에서 조회 (생성 일시 기준 내림차순 정렬)
-  const data = await Product.find().sort({ createdAt: "desc" }).exec();
+  const datas = await Product.find().sort({ createdAt: "desc" }).exec();
 
   // 2. 완료 메시지 반환
+  // 2-1. API명세서 틀에 맞게 데이터 수정
+  const filteredDatas = datas.map((data) => ({
+    id: data.id,
+    name: data.name,
+    description: data.description,
+    manager: data.manager,
+    status: data.status,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  }));
+  // 2-2. 반환
   return res.status(200).json({
     status: 200,
     message: "상품 목록 조회에 성공했습니다.",
-    data: data,
+    data: filteredDatas,
   });
 });
 
@@ -53,10 +64,21 @@ productsRouter.get("/products/:id", async (req, res) => {
   const data = await Product.findById(id).exec();
 
   // 3. 완료 메시지 반환
+  // 3-1. API명세서 틀에 맞게 데이터 수정
+  const filteredData = {
+    id: data.id,
+    name: data.name,
+    description: data.description,
+    manager: data.manager,
+    status: data.status,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
+  // 3-2. 반환
   return res.status(200).json({
     status: 200,
     message: "상품 상세 조회에 성공했습니다.",
-    data: data,
+    data: filteredData,
   });
 });
 
