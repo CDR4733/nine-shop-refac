@@ -34,14 +34,30 @@ productsRouter.post("/products", async (req, res) => {
 /** 상품 목록 조회(R-A) **/
 productsRouter.get("/products", async (req, res) => {
   // 1. DB에서 조회 (생성 일시 기준 내림차순 정렬)
+  const data = await Product.find().sort({ createdAt: "desc" }).exec();
+
   // 2. 완료 메시지 반환
+  return res.status(200).json({
+    status: 200,
+    message: "상품 목록 조회에 성공했습니다.",
+    data: data,
+  });
 });
 
 /** 상품 상세 조회(R-D) **/
 productsRouter.get("/products/:id", async (req, res) => {
   // 1. 상품 ID 파싱
+  const { id } = req.params;
+
   // 2. DB에서 조회
+  const data = await Product.findById(id).exec();
+
   // 3. 완료 메시지 반환
+  return res.status(200).json({
+    status: 200,
+    message: "상품 상세 조회에 성공했습니다.",
+    data: data,
+  });
 });
 
 /** 상품 수정(U) **/
