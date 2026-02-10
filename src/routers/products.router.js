@@ -137,10 +137,43 @@ productsRouter.put("/products/:id", async (req, res) => {
 /** 상품 삭제(D) **/
 productsRouter.delete("/products/:id", async (req, res) => {
   // 1. 상품 ID 파싱
-  // 2. DB에서 조회 (패스워드 포함)
-  // 3. 비밀번호 일치 여부 확인
-  // 4. DB에서 삭제
-  // 5. 완료 메시지 반환
+  const { id } = req.params;
+
+  // 2. 상품 삭제 정보 파싱
+  const { password } = req.body;
+
+  // 3. DB에서 조회 (패스워드 포함)
+  const existingProduct = await Product.findById(id, { password: true });
+
+  // 4. 비밀번호 일치 여부 확인
+  const isPasswordMatched = password === existingProduct.password;
+  if (!isPasswordMatched) {
+    return res.status(401).json({
+      status: 401,
+      message: "비밀번호가 일치하지 않습니다.",
+    });
+  }
+
+  // 5. DB에서 삭제
+  const data = await Product.findByIdAndDelete(id);
+
+  // 6. 완료 메시지 반환
+  // 6-1. API명세서 틀에 맞게 데이터 수정
+  const filteredData = {
+    id: data.id,
+    name: data.name,
+    description: data.description,
+    manager: data.manager,
+    status: data.status,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
+  // 6-2. 반환
+  return res.status(200).json({
+    status: 200,
+    message: "상품 삭제에 성공했습니다.",
+    data: filteredData,
+  });
 });
 
 export { productsRouter };
