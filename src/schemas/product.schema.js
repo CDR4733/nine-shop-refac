@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { PRODUCT_STATUS } from "../constants/product.constant";
+import { PRODUCT_STATUS } from "../constants/product.constant.js";
 
 const productSchema = new mongoose.Schema(
   // 1. 스키마 정의
